@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { API_URL } from '../config';
+import { API_URL } from './config';
 import { LockClosedIcon, LockOpenIcon, TrashIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from './AuthContext';
 
