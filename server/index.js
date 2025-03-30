@@ -18,13 +18,14 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: parseInt(process.env.DB_PORT),
-  ssl: process.env.NODE_ENV === "production" ? {
+  ssl: {  // Always use SSL in production
     rejectUnauthorized: false,
     require: true
-  } : false,
+  },
   connectionTimeoutMillis: 5000,
   idleTimeoutMillis: 30000
 });
+
 // const pool = new Pool({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
