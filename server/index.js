@@ -179,10 +179,13 @@ app.post('/api/delete', verifyUser, async (req, res) => {
   }
 });
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, '../client/dist')));
+// Serve static files - update this path
+const staticPath = path.join(__dirname, '../client/public');
+app.use(express.static(staticPath));
+
+// Handle SPA fallback - update this path
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 // Start server
