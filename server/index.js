@@ -183,24 +183,21 @@ app.get('/users', verifyUser, async (req, res) => {
         email, 
         TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login,
         status
-      FROM users 
+      FROM users
       ORDER BY last_login DESC NULLS LAST
     `);
-    
-    console.log('Database query result:', result.rows); // Debug database output
-    
-    // Explicitly format the response
-    res.json({
+
+    // Ensure consistent response format
+    res.status(200).json({
       success: true,
-      data: result.rows || [] // Ensure always an array
+      data: result.rows
     });
-    
+
   } catch (err) {
     console.error('Users route error:', err);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch users',
-      details: process.env.NODE_ENV === 'development' ? err.message : null
+      error: 'Failed to fetch users'
     });
   }
 });
