@@ -200,11 +200,6 @@ app.get('/users', verifyUser, async (req, res) => {
   }
 });
 
-// This should be LAST in your route definitions
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/public/index.html'));
-});
-
 app.post('/block', verifyUser, async (req, res) => {
   const { userIds } = req.body;
   try {
@@ -269,6 +264,10 @@ app.get('/', (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
+});
+// This should be LAST in your route definitions
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/index.html'));
 });
 // const clientPublicPath = path.join(__dirname, '../client/public');
 // app.use(express.static(clientPublicPath));
