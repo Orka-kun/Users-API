@@ -28,30 +28,57 @@ const UserManagement = () => {
       return () => clearTimeout(timer); // Cleanup the timer on component unmount or when message/error changes
     }
   }, [message, error]);
-
-  const fetchUsers = async () => {
+  
+const fetchUsers = async () => {
   try {
-    const res = await axios.get(`${API_URL}/users`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    console.log('Fetching users from:', `${API_URL}/users`); // Debug log
+    const response = await axios.get(`${API_URL}/users`, {
+      headers: { 
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
     });
 
-    // Debug the full response
-    console.log('Full API response:', res);
-
-    if (res.data?.success && Array.isArray(res.data.data)) {
-      setUsers(res.data.data);
+    console.log('API Response:', response); // Full response debug
+    
+    if (response.data?.status === 'success' && Array.isArray(response.data.data)) {
+      setUsers(response.data.data);
     } else {
-      throw new Error('Invalid response format');
+      throw new Error(response.data?.message || 'Invalid data format');
     }
   } catch (err) {
-    console.error('Fetch users error:', {
-      error: err.message,
-      response: err.response?.data
+    console.error('Fetch Error:', {
+      message: err.message,
+      response: err.response?.data,
+      stack: err.stack
     });
-    setError('Failed to load users');
-    setUsers([]); // Ensure users state is always an array
+    setError(err.response?.data?.message || 'Failed to load users');
+    setUsers([]); // Reset to empty array
   }
 };
+//   const fetchUsers = async () => {
+//   try {
+//     const res = await axios.get(`${API_URL}/users`, {
+//       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+//     });
+
+//     // Debug the full response
+//     console.log('Full API response:', res);
+
+//     if (res.data?.success && Array.isArray(res.data.data)) {
+//       setUsers(res.data.data);
+//     } else {
+//       throw new Error('Invalid response format');
+//     }
+//   } catch (err) {
+//     console.error('Fetch users error:', {
+//       error: err.message,
+//       response: err.response?.data
+//     });
+//     setError('Failed to load users');
+//     setUsers([]); // Ensure users state is always an array
+//   }
+// };
 
   const handleSelectAll = (e) => {
     if (e.target.checked) {
