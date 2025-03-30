@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from './config';
+const API_BASE_URL = 'https://users-api-odh2.onrender.com';
 import { LockClosedIcon, LockOpenIcon, TrashIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
 import { AuthContext } from './AuthContext';
 
@@ -31,32 +32,29 @@ const UserManagement = () => {
   
 const fetchUsers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/users`, {
+    const response = await axios.get(`${API_BASE_URL}/users`, {
       headers: { 
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
         'Accept': 'application/json'
-      }
+      },
+      withCredentials: true
     });
 
-    console.log('Full response:', response); // Debug log
+    console.log('Full API response:', response.data);
 
-    // Handle different response formats
     if (Array.isArray(response.data)) {
-      // Backend returns direct array
       setUsers(response.data);
     } else if (response.data?.data) {
-      // Backend returns { data: [...] }
       setUsers(response.data.data);
     } else {
-      throw new Error('Unexpected response format');
+      throw new Error('Unexpected response format: ' + JSON.stringify(response.data));
     }
-
   } catch (err) {
     console.error('API Error:', {
       message: err.message,
       status: err.response?.status,
       data: err.response?.data,
-      url: err.config?.url
+      config: err.config
     });
     setError(err.response?.data?.error || 'Failed to load users');
   }
