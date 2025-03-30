@@ -33,7 +33,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/login', { email, password });
+      const res = await axios.post(`${API_URL}/login`, { email, password });
       console.log('Login response:', res.data); // Debugging log
 
       // Check user status before proceeding
