@@ -86,6 +86,14 @@ const verifyUser = async (req, res, next) => {
   }
 };
 
+// Serve static files from client/public
+const clientBuildPath = path.join(__dirname, '../client/public');
+app.use(express.static(clientBuildPath));
+// Handle SPA routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
+
 app.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) return res.status(400).json({ error: 'All fields required' });
@@ -254,15 +262,14 @@ app.get('/', (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-const clientPublicPath = path.join(__dirname, '../client/public');
-app.use(express.static(clientPublicPath));
+// const clientPublicPath = path.join(__dirname, '../client/public');
+// app.use(express.static(clientPublicPath));
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(clientPublicPath, 'index.html'));
+// });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(clientPublicPath, 'index.html'));
-});
 // const publicPath = path.join(__dirname, 'public');
 // app.use(express.static(publicPath));
-
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(publicPath, 'index.html'));
 // });
