@@ -264,6 +264,24 @@ app.post('/delete', verifyUser, async (req, res) => {
   }
 });
 
+//Temporary debug route
+app.get('/debug-db', async (req, res) => {
+  try {
+    const users = await pool.query('SELECT * FROM users');
+    const now = await pool.query('SELECT NOW()');
+    res.json({
+      dbConnection: 'OK',
+      userCount: users.rowCount,
+      serverTime: now.rows[0].now,
+      sampleUser: users.rows[0] || null
+    });
+  } catch (err) {
+    res.status(500).json({
+      dbConnection: 'FAILED',
+      error: err.message
+    });
+  }
+});
 
 // Add a root route for testing
 const port = process.env.PORT || 5000;
