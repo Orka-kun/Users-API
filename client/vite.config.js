@@ -5,6 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(),tailwindcss()],
   build: {
-    outDir: '../server/public' // Sends build to your Express server
+    outDir: '../server/public',
+    emptyOutDir: true
   }
 })
