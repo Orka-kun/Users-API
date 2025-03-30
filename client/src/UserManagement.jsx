@@ -32,21 +32,24 @@ const UserManagement = () => {
   const fetchUsers = async () => {
   try {
     const res = await axios.get(`${API_URL}/users`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     });
 
-    // Handle new response format
-    if (res.data.success && Array.isArray(res.data.data)) {
+    // Debug the full response
+    console.log('Full API response:', res);
+
+    if (res.data?.success && Array.isArray(res.data.data)) {
       setUsers(res.data.data);
     } else {
-      throw new Error(res.data.error || 'Invalid data format');
+      throw new Error('Invalid response format');
     }
   } catch (err) {
     console.error('Fetch users error:', {
-      error: err,
+      error: err.message,
       response: err.response?.data
     });
-    setError(err.response?.data?.error || 'Failed to load users');
+    setError('Failed to load users');
+    setUsers([]); // Ensure users state is always an array
   }
 };
 
