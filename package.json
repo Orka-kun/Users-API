@@ -2,7 +2,7 @@
   "name": "your-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd client && npm ci && npm run build && cd ../server && npm ci",
+    "build": "cd client && npm install --force && npm run build && cd ../server && npm install",
     "start": "cd server && node index.js"
   },
   "engines": {
