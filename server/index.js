@@ -26,15 +26,6 @@ const pool = new Pool({
   idleTimeoutMillis: 30000
 });
 
-// const pool = new Pool({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_NAME,
-//   port: process.env.DB_PORT,
-//   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
-// });
-
 // Test connection
 pool.query('SELECT NOW()', (err, res) => {
   if (err) {
@@ -173,55 +164,24 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 app.get('/users', verifyUser, async (req, res) => {
   try {
-    console.log('Fetching users...'); // Debug log
-    const result = await pool.query('SELECT * FROM users');
-    console.log('Query result:', result.rows); // Debug log
+    const result = await pool.query(`
+      SELECT id, name, email, status,
+             TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login
+      FROM users
+      ORDER BY last_login DESC
+    `);
     
-    // Explicit response format
-    res.json({
-      status: 'success',
-      data: result.rows,
-      timestamp: new Date().toISOString()
-    });
+    // Return as plain array
+    res.json(result.rows);
     
   } catch (err) {
     console.error('Database error:', err);
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to fetch users',
-      details: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
+    res.status(500).json({ error: 'Database query failed' });
   }
 });
-// app.get('/users', verifyUser, async (req, res) => {
-//   try {
-//     const result = await pool.query(`
-//       SELECT 
-//         id, 
-//         name, 
-//         email, 
-//         TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login,
-//         status
-//       FROM users
-//       ORDER BY last_login DESC NULLS LAST
-//     `);
-
-//     // Ensure consistent response format
-//     res.status(200).json({
-//       success: true,
-//       data: result.rows
-//     });
-
-//   } catch (err) {
-//     console.error('Users route error:', err);
-//     res.status(500).json({
-//       success: false,
-//       error: 'Failed to fetch users'
-//     });
-//   }
-// });
 
 app.post('/block', verifyUser, async (req, res) => {
   const { userIds } = req.body;
@@ -268,18 +228,13 @@ app.post('/delete', verifyUser, async (req, res) => {
 app.get('/debug-db', async (req, res) => {
   try {
     const users = await pool.query('SELECT * FROM users');
-    const now = await pool.query('SELECT NOW()');
     res.json({
-      dbConnection: 'OK',
-      userCount: users.rowCount,
-      serverTime: now.rows[0].now,
-      sampleUser: users.rows[0] || null
+      db_status: 'connected',
+      user_count: users.rowCount,
+      sample_data: users.rows[0] || null
     });
   } catch (err) {
-    res.status(500).json({
-      dbConnection: 'FAILED',
-      error: err.message
-    });
+    res.status(500).json({ db_status: 'error', error: err.message });
   }
 });
 
