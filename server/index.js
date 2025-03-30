@@ -164,6 +164,23 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+//temporary debug route
+app.get('/debug-db', async (req, res) => {
+  try {
+    const users = await pool.query('SELECT * FROM users');
+    res.json({
+      status: 'success',
+      db_connection: 'active',
+      user_count: users.rowCount,
+      sample_user: users.rows[0] || null
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      error: err.message
+    });
+  }
+});
 
 app.get('/users', verifyUser, async (req, res) => {
   try {
@@ -181,6 +198,11 @@ app.get('/users', verifyUser, async (req, res) => {
     console.error('Database error:', err);
     res.status(500).json({ error: 'Database query failed' });
   }
+});
+
+// This should be LAST in your route definitions
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/public/index.html'));
 });
 
 app.post('/block', verifyUser, async (req, res) => {
@@ -221,20 +243,6 @@ app.post('/delete', verifyUser, async (req, res) => {
     res.json({ message: 'User deleted successfully!' });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
-  }
-});
-
-//Temporary debug route
-app.get('/debug-db', async (req, res) => {
-  try {
-    const users = await pool.query('SELECT * FROM users');
-    res.json({
-      db_status: 'connected',
-      user_count: users.rowCount,
-      sample_data: users.rows[0] || null
-    });
-  } catch (err) {
-    res.status(500).json({ db_status: 'error', error: err.message });
   }
 });
 
