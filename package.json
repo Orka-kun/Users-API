@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "cd client && npm install --force && npm run build",
-  "start": "node server/index.js"
+    "start": "node server/index.js"
   },
   "engines": {
     "node": "22.x"
