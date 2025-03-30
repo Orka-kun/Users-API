@@ -176,22 +176,31 @@ app.post('/login', async (req, res) => {
 
 app.get('/users', verifyUser, async (req, res) => {
   try {
-    // Simple query with explicit column selection
     const result = await pool.query(`
-      SELECT id, name, email, 
-             last_login, 
-             status 
+      SELECT 
+        id, 
+        name, 
+        email, 
+        TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login,
+        status
       FROM users 
       ORDER BY last_login DESC NULLS LAST
     `);
     
-    res.json(result.rows);
+    console.log('Database query result:', result.rows); // Debug database output
+    
+    // Explicitly format the response
+    res.json({
+      success: true,
+      data: result.rows || [] // Ensure always an array
+    });
     
   } catch (err) {
-    console.error('Users route error:', err);  // Log for debugging
-    res.status(500).json({ 
+    console.error('Users route error:', err);
+    res.status(500).json({
+      success: false,
       error: 'Failed to fetch users',
-      details: process.env.NODE_ENV === 'development' ? err.message : null 
+      details: process.env.NODE_ENV === 'development' ? err.message : null
     });
   }
 });
