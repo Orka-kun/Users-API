@@ -34,13 +34,23 @@ const UserManagement = () => {
     const res = await axios.get(`${API_URL}/users`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
+    
+    // Debugging log
+    console.log('Users data:', res.data);
+    
+    // Ensure data is properly formatted
+    if (!Array.isArray(res.data)) {
+      throw new Error('Invalid data format received');
+    }
+    
     setUsers(res.data);
   } catch (err) {
-    if (err.response?.status === 403) {
+    console.error('Fetch users error:', err);
+    if (err.response?.status === 401 || err.response?.status === 403) {
       localStorage.removeItem('token');
       navigate('/login');
     } else {
-      setError(err.response?.data?.error || 'Server error');
+      setError(err.response?.data?.error || 'Failed to load users');
     }
   }
 };
@@ -62,7 +72,7 @@ const UserManagement = () => {
   const handleBlock = async () => {
     try {
       const res = await axios.post(
-        'http://localhost:5000/block',
+        `${API_URL}/block`,
         { userIds: selectedUsers },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -84,7 +94,7 @@ const UserManagement = () => {
   const handleUnblock = async () => {
     try {
       const res = await axios.post(
-        'http://localhost:5000/unblock',
+        `${API_URL}/unblock`,
         { userIds: selectedUsers },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -99,7 +109,7 @@ const UserManagement = () => {
   const handleDelete = async () => {
     try {
       const res = await axios.post(
-        'http://localhost:5000/delete',
+        `${API_URL}/delete`,
         { userIds: selectedUsers },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
@@ -191,8 +201,12 @@ const UserManagement = () => {
       </th>
     </tr>
   </thead>
-  <tbody className="bg-white divide-y divide-gray-200">
+{/*   <tbody className="bg-white divide-y divide-gray-200">
     {users.map((user) => (
+      <tr className='text-black' key={user.id}> */}
+  <tbody className="bg-white divide-y divide-gray-200">
+  {Array.isArray(users) && users.length > 0 ? (
+    users.map((user) => (
       <tr className='text-black' key={user.id}>
         <td className="px-4 py-4 text-center">
           <input
@@ -215,8 +229,15 @@ const UserManagement = () => {
           {user.last_login ? new Date(user.last_login).toLocaleString() : 'Never logged in'}
         </td>
       </tr>
-    ))}
-  </tbody>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="4" className="px-4 py-4 text-center text-gray-500">
+        {users === null ? 'Loading...' : 'No users found'}
+      </td>
+    </tr>
+  )}
+</tbody>
 </table>
       </div>
     </div>
