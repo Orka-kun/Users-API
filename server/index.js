@@ -173,34 +173,55 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
 app.get('/users', verifyUser, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT 
-        id, 
-        name, 
-        email, 
-        TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login,
-        status
-      FROM users
-      ORDER BY last_login DESC NULLS LAST
-    `);
-
-    // Ensure consistent response format
-    res.status(200).json({
-      success: true,
-      data: result.rows
+    console.log('Fetching users...'); // Debug log
+    const result = await pool.query('SELECT * FROM users');
+    console.log('Query result:', result.rows); // Debug log
+    
+    // Explicit response format
+    res.json({
+      status: 'success',
+      data: result.rows,
+      timestamp: new Date().toISOString()
     });
-
+    
   } catch (err) {
-    console.error('Users route error:', err);
+    console.error('Database error:', err);
     res.status(500).json({
-      success: false,
-      error: 'Failed to fetch users'
+      status: 'error',
+      message: 'Failed to fetch users',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 });
+// app.get('/users', verifyUser, async (req, res) => {
+//   try {
+//     const result = await pool.query(`
+//       SELECT 
+//         id, 
+//         name, 
+//         email, 
+//         TO_CHAR(last_login, 'YYYY-MM-DD HH24:MI:SS') as last_login,
+//         status
+//       FROM users
+//       ORDER BY last_login DESC NULLS LAST
+//     `);
+
+//     // Ensure consistent response format
+//     res.status(200).json({
+//       success: true,
+//       data: result.rows
+//     });
+
+//   } catch (err) {
+//     console.error('Users route error:', err);
+//     res.status(500).json({
+//       success: false,
+//       error: 'Failed to fetch users'
+//     });
+//   }
+// });
 
 app.post('/block', verifyUser, async (req, res) => {
   const { userIds } = req.body;
