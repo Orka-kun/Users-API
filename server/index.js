@@ -87,11 +87,10 @@ const verifyUser = async (req, res, next) => {
 };
 
 // Serve static files from client/public
-const clientBuildPath = path.join(__dirname, '../client/public');
-app.use(express.static(clientBuildPath));
+app.use(express.static(path.join(__dirname, '../client/public')));
 // Handle SPA routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
+  res.sendFile(path.join(__dirname, '../client/public/index.html'));
 });
 
 app.post('/register', async (req, res) => {
