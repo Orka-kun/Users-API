@@ -2,8 +2,8 @@
   "name": "your-app",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd client && npm install && npm run build",
-    "start": "node server/index.js"
+    "build": "cd client && npm install --force && npm run build",
+  "start": "node server/index.js"
   },
   "engines": {
     "node": "22.x"
