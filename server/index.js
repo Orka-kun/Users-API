@@ -254,9 +254,15 @@ app.get('/', (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
+const clientPublicPath = path.join(__dirname, '../client/public');
+app.use(express.static(clientPublicPath));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(publicPath, 'index.html'));
+  res.sendFile(path.join(clientPublicPath, 'index.html'));
 });
+// const publicPath = path.join(__dirname, 'public');
+// app.use(express.static(publicPath));
+
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(publicPath, 'index.html'));
+// });
