@@ -34,24 +34,19 @@ const UserManagement = () => {
     const res = await axios.get(`${API_URL}/users`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
-    
-    // Debugging log
-    console.log('Users data:', res.data);
-    
-    // Ensure data is properly formatted
-    if (!Array.isArray(res.data)) {
-      throw new Error('Invalid data format received');
-    }
-    
-    setUsers(res.data);
-  } catch (err) {
-    console.error('Fetch users error:', err);
-    if (err.response?.status === 401 || err.response?.status === 403) {
-      localStorage.removeItem('token');
-      navigate('/login');
+
+    // Handle new response format
+    if (res.data.success && Array.isArray(res.data.data)) {
+      setUsers(res.data.data);
     } else {
-      setError(err.response?.data?.error || 'Failed to load users');
+      throw new Error(res.data.error || 'Invalid data format');
     }
+  } catch (err) {
+    console.error('Fetch users error:', {
+      error: err,
+      response: err.response?.data
+    });
+    setError(err.response?.data?.error || 'Failed to load users');
   }
 };
 
